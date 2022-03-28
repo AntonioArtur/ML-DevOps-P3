@@ -1,13 +1,13 @@
-from ml.data import *
-from ml.model import * 
+from src.ml.data import *
+from src.ml.model import * 
 
 def test_null_removal(clean_data):
     assert len(clean_data)==len(clean_data.dropna())
     
 def test_processing(clean_data):
-    model = load_model()
-    encoder = load_encoder()
-    lb = load_lb()
+    model = load_model("model/model.pkl")
+    encoder = load_encoder("model/encoder.pkl")
+    lb = load_lb("model/lb.pkl")
     cat_features = [
                     "workclass",
                     "education",
@@ -24,9 +24,9 @@ def test_processing(clean_data):
     assert X.shape[0]==y.shape[0]
     
 def test_infer(clean_data):
-    model = load_model()
-    encoder = load_encoder()
-    lb = load_lb()
+    model = load_model("model/model.pkl")
+    encoder = load_encoder("model/encoder.pkl")
+    lb = load_lb("model/lb.pkl")
     cat_features = [
                     "workclass",
                     "education",
