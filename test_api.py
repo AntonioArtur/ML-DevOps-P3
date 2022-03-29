@@ -2,10 +2,12 @@ import pytest
 from fastapi.testclient import TestClient
 from main import app
 
+
 @pytest.fixture
 def client():
     client_app = TestClient(app)
     return client_app
+
 
 def test_get(client):
     r = client.get("/")
@@ -13,8 +15,9 @@ def test_get(client):
     assert r.json() == {"author": "antonio artur",
                         "date": "2022 mar 28",
                         "local": "brazil"}
-    
-def test_inference(client):
+
+
+def test_inference_class_zero(client):
     r = client.post("/inference", json={
       "age": 39,
       "workclass": "State-gov",
@@ -34,7 +37,8 @@ def test_inference(client):
     assert r.status_code == 200
     assert r.json() == {"prediction": " <=50K"}
 
-def test_inference(client):
+
+def test_inference_class_one(client):
     r = client.post("/inference", json={
       "age": 52,
       "workclass": "Self-emp-not-inc",
@@ -53,7 +57,8 @@ def test_inference(client):
     })
     assert r.status_code == 200
     assert r.json() == {"prediction": " >50K"}
-    
+
+
 def test_input_malformed(client):
     r = client.post("/inference", json={
       "age": 39,

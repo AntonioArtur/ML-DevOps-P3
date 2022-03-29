@@ -1,8 +1,10 @@
-# Put the code for your API here.
-from src.ml.data import *
-from src.ml.model import *
+import os
+import pandas as pd
+from src.ml.data import process_data
+from src.ml.model import load_model, load_encoder, load_lb, inference
 from fastapi import FastAPI
-from pydantic import BaseModelimport os
+from pydantic import BaseModel
+
 
 if "DYNO" in os.environ and os.path.isdir(".dvc"):
     os.system("dvc config core.no_scm true")
@@ -10,7 +12,9 @@ if "DYNO" in os.environ and os.path.isdir(".dvc"):
         exit("dvc pull failed")
     os.system("rm -r .dvc .apt/usr/lib/dvc")
 
+
 app = FastAPI()
+
 
 class User(BaseModel):
     age: int
@@ -28,19 +32,21 @@ class User(BaseModel):
     hours_per_week: int
     native_country: str
 
+
 @app.get("/")
 async def info():
     return {"author": "antonio artur",
             "date": "2022 mar 28",
             "local": "brazil"}
 
+
 @app.post("/inference")
 async def inference_api(user: User):
-    
+
     model = load_model("model/model.pkl")
     encoder = load_encoder("model/encoder.pkl")
     lb = load_lb("model/lb.pkl")
-    
+
     cat_features = [
                 "workclass",
                 "education",
@@ -51,33 +57,25 @@ async def inference_api(user: User):
                 "sex",
                 "native-country",
             ]
-    
-    df = pd.DataFrame([dict(zip(['age', 'workclass', 'fnlgt', 'education', 'education-num',
-                                   'marital-status', 'occupation', 'relationship', 'race', 'sex',
-                                   'capital-gain', 'capital-loss', 'hours-per-week', 'native-country',],
-                                    [user.age,
-                                    user.workclass,
-                                    user.fnlgt,
-                                    user.education,
-                                    user.education_num,
-                                    user.marital_status,
-                                    user.occupation,
-                                    user.relationship,
-                                    user.race,
-                                    user.sex,
-                                    user.capital_gain,
-                                    user.capital_loss,
-                                    user.hours_per_week,
-                                    user.native_country]))])
-    
+
+    data = [user.age, user.workclass, user.fnlgt, user.education,
+            user.education_num, user.marital_status, user.occupation,
+            user.relationship, user.race, user.sex, user.capital_gain,
+            user.capital_loss, user.hours_per_week, user.native_country]
+
+    columns = ['age', 'workclass', 'fnlgt', 'education', 'education-num',
+               'marital-status', 'occupation', 'relationship', 'race', 'sex',
+               'capital-gain', 'capital-loss',
+               'hours-per-week', 'native-country']
+
+    df = pd.DataFrame([dict(zip(columns, data))])
+
     print(df)
     print(df.columns)
-    X, _, _, _ = process_data(
-    df, categorical_features=cat_features, training=False, encoder=encoder, lb=lb
-    )
-    
-    
+
+    X, _, _, _ = process_data(df, categorical_features=cat_features,
+                              training=False, encoder=encoder, lb=lb)
+
     predictions = inference(model, X)
     predictions = lb.inverse_transform(predictions)[0]
     return {"prediction": predictions}
-    

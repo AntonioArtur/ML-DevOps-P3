@@ -2,23 +2,30 @@ import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 
+
 def load_model(path="../model/model.pkl"):
     return joblib.load(path)
+
 
 def load_encoder(path="../model/encoder.pkl"):
     return joblib.load(path)
 
+
 def load_lb(path="../model/lb.pkl"):
     return joblib.load(path)
+
 
 def save_model(model):
     joblib.dump(model, "../model/model.pkl")
 
+
 def save_encoder(encoder):
     joblib.dump(encoder, "../model/encoder.pkl")
-    
+
+
 def save_lb(lb):
     joblib.dump(lb, "../model/lb.pkl")
+
 
 # Optional: implement hyperparameter tuning.
 def train_model(X_train, y_train):
@@ -43,7 +50,8 @@ def train_model(X_train, y_train):
 
 def compute_model_metrics(y, preds):
     """
-    Validates the trained machine learning model using precision, recall, and F1.
+    Validates the trained machine learning
+    model using precision, recall, and F1.
 
     Inputs
     ------
