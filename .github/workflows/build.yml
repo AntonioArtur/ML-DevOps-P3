@@ -28,7 +28,7 @@ jobs:
       - name: Setup remote
         run: dvc remote add -f -d myremote s3://mldevops-project3/data_project3
       - name: Pull data from DVC
-        run: dvc pull data -R
+        run: dvc pull
       - name: Run Flake8
         run: flake8
       - name: Run pytest
